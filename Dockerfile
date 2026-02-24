@@ -1,10 +1,15 @@
-FROM node:latest as node
+FROM node:20-alpine AS build
+ARG REACT_APP_API_BASE_URL=/api/v4
+ENV REACT_APP_API_BASE_URL=$REACT_APP_API_BASE_URL
 
 WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
 COPY . .
-
-RUN npm install
-RUN npm run build --prod
+RUN npm run build
 
 FROM nginx:alpine
-COPY --from=node /app/dist/myproject /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

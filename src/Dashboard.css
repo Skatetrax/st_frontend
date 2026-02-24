@@ -1,0 +1,223 @@
+/* Dashboard background and font */
+.dashboard-bg {
+  background: #18181b;
+  min-height: 100vh;
+  color: #f3f4f6;
+  font-family: 'Inter', 'Roboto', Arial, sans-serif;
+}
+
+/* Navbar */
+.dashboard-navbar {
+  background: #18181b !important;
+  border-bottom: 1px solid #23232a;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.dashboard-navbar .navbar-brand {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #fff !important;
+}
+.dashboard-navbar .nav-link.active, .dashboard-navbar .nav-link:focus {
+  color: #a78bfa !important;
+  border-bottom: 2px solid #a78bfa;
+}
+.dashboard-navbar .nav-link {
+  color: #d1d5db !important;
+  margin-right: 1rem;
+  font-weight: 500;
+}
+.dashboard-navbar .user-avatar {
+  border: 2px solid #a78bfa;
+}
+
+/* Dashboard header and subtitle */
+.dashboard-header {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  color: #fff;
+}
+.dashboard-subtitle {
+  color: #a1a1aa;
+  font-size: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+/* Card styles */
+.dashboard-card {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #26272b !important;
+  border: none;
+  border-radius: 1.2rem !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  margin-bottom: 1.2rem;
+  padding: 0.7rem 0.7rem 0.7rem 0.7rem !important;
+}
+.dashboard-card .card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #fff;
+}
+.dashboard-card .card-subtitle {
+  color: #a1a1aa;
+  font-size: 0.88rem;
+  margin-bottom: 0.7rem;
+}
+.dashboard-card .view-report-btn {
+  background: #23232a;
+  color: #a78bfa;
+  border: 1px solid #a78bfa;
+  border-radius: 0.7rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 0.2rem 0.8rem;
+  float: right;
+  margin-top: -1.7rem;
+}
+.dashboard-card .view-report-btn:hover {
+  background: #a78bfa;
+  color: #23232a;
+}
+
+/* Chart containers */
+.chart-container {
+  min-height: 150px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.donut-chart-container {
+  min-height: 300px;
+  height: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.2rem;
+  background: inherit;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.donut-chart-container .chartjs-legend {
+  margin-top: 12px;
+}
+
+/* Table styles */
+.dashboard-table {
+  background: #26272b;
+}
+
+.dashboard-table thead th {
+  color: #a1a1aa;
+  font-weight: 600;
+  border-bottom: 1px solid #2d2d36;
+}
+.dashboard-table tbody tr {
+  border-bottom: 1px solid #23232a;
+  background: #26272b !important;
+}
+.dashboard-table td, .dashboard-table th {
+  vertical-align: middle;
+}
+.dashboard-table .avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 10px;
+  font-size: 1.1rem;
+  text-align: center;
+  line-height: 32px;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Override Bootstrap's table-dark background and text color */
+.dashboard-table.table-dark,
+.dashboard-table.table-dark thead th,
+.dashboard-table.table-dark tbody tr,
+.dashboard-table.table-dark td,
+.dashboard-table.table-dark th {
+  background-color: #26272b !important; /* or your card color */
+  color: #f3f4f6 !important;           /* or your preferred text color */
+}
+
+/* Progress bar for Saving Goal */
+.saving-progress {
+  background: #23232a;
+  border-radius: 1rem;
+  height: 12px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+.saving-progress-bar {
+  background: linear-gradient(90deg, #a78bfa 0%, #34d399 100%);
+  height: 100%;
+  border-radius: 1rem;
+}
+
+/* Blog card illustration */
+.blog-illustration {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* Update Time Modal Custom Styles */
+.update-time-modal .modal-dialog {
+  min-width: 700px !important;
+  max-width: 900px !important;
+  width: 75vw !important;
+}
+.update-time-modal .modal-content {
+  border-radius: 0.6rem !important;
+}
+.update-time-modal .modal-header {
+  background: #22c55e !important;
+  padding: 0.7rem 2rem 0.5rem 2rem !important;
+  border-top-left-radius: 0.6rem !important;
+  border-top-right-radius: 0.6rem !important;
+  align-items: center !important;
+}
+.update-time-modal .modal-title {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+}
+.update-time-modal .btn-primary {
+  background: #2563eb !important;
+  border-radius: 0.5rem !important;
+  font-size: 1rem !important;
+  padding: 0.5rem 2rem !important;
+  border: none !important;
+}
+.update-time-modal .form-label {
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+}
+.update-time-modal .row {
+  gap: 0.5rem 0 !important;
+}
+.update-time-modal .col-md-3, .update-time-modal .col-md-4 {
+  margin-bottom: 1rem !important;
+}
+
+/* Responsive tweaks */
+@media (max-width: 991px) {
+  .dashboard-header {
+    font-size: 1.1rem;
+  }
+  .dashboard-card {
+    margin-bottom: 0.7rem;
+    padding: 0.7rem 0.7rem 0.7rem 0.7rem !important;
+  }
+  .chart-container {
+    min-height: 110px;
+  }
+}
