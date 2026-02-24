@@ -1,0 +1,10 @@
+services:
+  frontend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_BASE_URL: http://localhost:5000/api/v4
+    ports:
+      - "3000:80"
+    restart: unless-stopped

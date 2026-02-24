@@ -1,0 +1,57 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.flex-fill {
+  flex: 1 1 auto;
+}
+
+/* Update Time Modal */
+.update-time-modal .modal-dialog,
+.modal-dialog.update-time-modal,
+.update-time-modal-content,
+.update-time-modal .modal-dialog .modal-content,
+.modal-dialog.update-time-modal .modal-content {
+  min-width: 700px !important;
+  max-width: 900px !important;
+  width: 75vw !important;
+  border-radius: 0.6rem !important;
+}
+.update-time-modal .modal-header,
+.update-time-modal-content .modal-header {
+  background: #22c55e !important;
+  padding: 0.7rem 2rem 0.5rem 2rem !important;
+  border-top-left-radius: 0.6rem !important;
+  border-top-right-radius: 0.6rem !important;
+  align-items: center !important;
+}
+.update-time-modal .modal-title,
+.update-time-modal-content .modal-title {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+}
+.update-time-modal .btn-primary,
+.update-time-modal-content .btn-primary {
+  background: #2563eb !important;
+  border-radius: 0.5rem !important;
+  font-size: 1rem !important;
+  padding: 0.5rem 2rem !important;
+  border: none !important;
+}
+.update-time-modal .form-label,
+.update-time-modal-content .form-label {
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+}
+.update-time-modal .row,
+.update-time-modal-content .row {
+  gap: 0.5rem 0 !important;
+}
+.update-time-modal .col-md-3, .update-time-modal .col-md-4,
+.update-time-modal-content .col-md-3, .update-time-modal-content .col-md-4 {
+  margin-bottom: 1rem !important;
+}
