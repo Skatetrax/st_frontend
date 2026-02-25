@@ -1,0 +1,125 @@
+.add-session-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: linear-gradient(135deg, rgba(42, 27, 161, 0.85), rgba(29, 210, 177, 0.85) 100%);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 1rem);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
+}
+
+.add-session-card {
+  width: 100%;
+  max-width: 480px;
+  background: #1e293b;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.add-session-header {
+  background: #22c55e;
+  padding: 1.25rem 1.5rem;
+}
+
+.add-session-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.add-session-form {
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.add-session-form .form-label {
+  color: #94a3b8;
+  font-weight: 500;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.add-session-form .form-control,
+.add-session-form .form-select {
+  background: #0f172a;
+  border: 1px solid #334155;
+  color: #f1f5f9;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  min-height: 48px;
+  transition: border-color 0.15s ease;
+}
+
+.add-session-form .form-control:focus,
+.add-session-form .form-select:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.2);
+  background: #0f172a;
+  color: #f1f5f9;
+}
+
+.add-session-form .form-control::placeholder {
+  color: #475569;
+}
+
+.add-session-submit {
+  font-weight: 700;
+  font-size: 1.125rem;
+  padding: 0.875rem;
+  border-radius: 0.75rem;
+  letter-spacing: 0.3px;
+}
+
+.add-session-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 1rem;
+  color: #94a3b8;
+  font-size: 1.1rem;
+}
+
+.add-session-success {
+  padding: 3rem 1.5rem 2rem;
+  text-align: center;
+  color: #f1f5f9;
+}
+
+.success-check {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #22c55e;
+  color: #fff;
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.add-session-success h2 {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.add-session-success p {
+  color: #94a3b8;
+  margin-bottom: 2rem;
+}
+
+.success-actions {
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+/* Option text in dark selects */
+.add-session-form .form-select option {
+  background: #1e293b;
+  color: #f1f5f9;
+}
