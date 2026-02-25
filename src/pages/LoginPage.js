@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { login, checkSession } from "../api/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function LoginPage({ onLogin }) {
   const [aLogin, setALogin] = useState("");
@@ -8,6 +8,7 @@ export default function LoginPage({ onLogin }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,7 +19,8 @@ export default function LoginPage({ onLogin }) {
       if (resp.message === "Login successful") {
         const session = await checkSession();
         onLogin(session);
-        navigate("/dashboard");
+        const destination = location.state?.from || "/dashboard";
+        navigate(destination, { replace: true });
       } else {
         setError(resp.message || "Login failed");
       }

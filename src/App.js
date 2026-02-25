@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import { checkSession } from "./api/api";
@@ -9,7 +9,15 @@ import SkaterOverviewPage from "./pages/SkaterOverviewPage";
 import EquipmentPage from "./pages/EquipmentPage";
 import MaintenancePage from "./pages/MaintenancePage";
 import IceTimePage from "./pages/IceTimePage";
+import AddSessionPage from "./pages/AddSessionPage";
 
+function RequireAuth({ session, children }) {
+  const location = useLocation();
+  if (!session.logged_in) {
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+  }
+  return children;
+}
 
 function App() {
   const [session, setSession] = useState(null);
@@ -24,11 +32,12 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<LoginPage onLogin={setSession} />} />
-        <Route path="/dashboard" element={session.logged_in ? <DashboardPage /> : <Navigate to="/login" />} />
-        <Route path="/skater_overview" element={session.logged_in ? <SkaterOverviewPage /> : <Navigate to="/login" />} />
-        <Route path="/equipment/configs" element={session.logged_in ? <EquipmentPage /> : <Navigate to="/login" />} />
-        <Route path="/equipment/maintenance" element={session.logged_in ? <MaintenancePage /> : <Navigate to="/login" />} />
-        <Route path="/ice_time" element={session.logged_in ? <IceTimePage /> : <Navigate to="/login" />} />
+        <Route path="/dashboard" element={<RequireAuth session={session}><DashboardPage /></RequireAuth>} />
+        <Route path="/skater_overview" element={<RequireAuth session={session}><SkaterOverviewPage /></RequireAuth>} />
+        <Route path="/equipment/configs" element={<RequireAuth session={session}><EquipmentPage /></RequireAuth>} />
+        <Route path="/equipment/maintenance" element={<RequireAuth session={session}><MaintenancePage /></RequireAuth>} />
+        <Route path="/ice_time" element={<RequireAuth session={session}><IceTimePage /></RequireAuth>} />
+        <Route path="/add-session" element={<RequireAuth session={session}><AddSessionPage /></RequireAuth>} />
         <Route path="*" element={<Navigate to={session.logged_in ? "/dashboard" : "/login"} />} />
       </Routes>
     </Router>
