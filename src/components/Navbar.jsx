@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Navbar, Nav, NavDropdown, Button, Modal, Form } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
-import { getRinks, getSkaterOverview, getCoaches, getIceTypes, submitIceTime, getIceTime } from "../api/api";
+import { getRinks, getSkaterOverview, getCoaches, getIceTypes, submitIceTime } from "../api/api";
 import { fmtTime } from "../utils/timeUtils";
 import dayjs from "dayjs";
 import "../Dashboard.css";
@@ -49,12 +49,9 @@ export default function AppNavbar({ activePage, onDataChange }) {
   useEffect(() => {
     async function fetchUserInfo() {
       try {
-        const [userData, iceTimeData] = await Promise.all([
-          getSkaterOverview(),
-          getIceTime(),
-        ]);
+        const userData = await getSkaterOverview();
         setFirstName(userData?.user_general?.user_first_name || "User");
-        setTotalHours(fmtTime(iceTimeData?.total_time));
+        setTotalHours(fmtTime(userData?.total_ice_time));
       } catch (err) {
         setFirstName("User");
         setTotalHours("");
@@ -178,6 +175,19 @@ export default function AppNavbar({ activePage, onDataChange }) {
               {link.label}
             </Nav.Link>
           ))}
+          <NavDropdown
+            title="Performances"
+            id="performances-dropdown"
+            active={location.pathname.startsWith("/performances")}
+            menuVariant="dark"
+          >
+            <NavDropdown.Item as={Link} to="/performances/competitions">
+              Competitions
+            </NavDropdown.Item>
+            <NavDropdown.Item as={Link} to="/performances/exhibitions">
+              Exhibitions & Shows
+            </NavDropdown.Item>
+          </NavDropdown>
           <NavDropdown
             title="Equipment"
             id="equipment-dropdown"

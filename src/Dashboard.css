@@ -208,6 +208,36 @@
   margin-bottom: 1rem !important;
 }
 
+/* Competition Status Badges */
+.status-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25em 0.6em;
+  border-radius: 0.4rem;
+}
+.status-badge.purple-badge {
+  background: #a78bfa;
+  color: #18181b;
+}
+.status-badge.teal-badge {
+  background: #5eead4;
+  color: #18181b;
+}
+.status-badge.gray-badge {
+  background: #52525b;
+  color: #d4d4d8;
+}
+
+/* Competition Detail Modal */
+.comp-detail-modal .modal-content {
+  background: #26272b;
+  border: 1px solid #2d2d36;
+  border-radius: 0.8rem;
+}
+.comp-detail-modal .modal-header .btn-close {
+  filter: invert(1);
+}
+
 /* Responsive tweaks */
 @media (max-width: 991px) {
   .dashboard-header {

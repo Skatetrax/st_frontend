@@ -10,6 +10,8 @@ import EquipmentPage from "./pages/EquipmentPage";
 import MaintenancePage from "./pages/MaintenancePage";
 import IceTimePage from "./pages/IceTimePage";
 import AddSessionPage from "./pages/AddSessionPage";
+import CompetitionsPage from "./pages/CompetitionsPage";
+import ExhibitionsPage from "./pages/ExhibitionsPage";
 
 function RequireAuth({ session, children }) {
   const location = useLocation();
@@ -37,6 +39,8 @@ function App() {
         <Route path="/equipment/configs" element={<RequireAuth session={session}><EquipmentPage /></RequireAuth>} />
         <Route path="/equipment/maintenance" element={<RequireAuth session={session}><MaintenancePage /></RequireAuth>} />
         <Route path="/ice_time" element={<RequireAuth session={session}><IceTimePage /></RequireAuth>} />
+        <Route path="/performances/competitions" element={<RequireAuth session={session}><CompetitionsPage /></RequireAuth>} />
+        <Route path="/performances/exhibitions" element={<RequireAuth session={session}><ExhibitionsPage /></RequireAuth>} />
         <Route path="/add-session" element={<RequireAuth session={session}><AddSessionPage /></RequireAuth>} />
         <Route path="*" element={<Navigate to={session.logged_in ? "/dashboard" : "/login"} />} />
       </Routes>
