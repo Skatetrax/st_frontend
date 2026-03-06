@@ -23,5 +23,5 @@ jobs:
         with:
           context: .
           push: true
-          build-args: REACT_APP_API_BASE_URL=https://api.skatetrax.com/api/v4
+          build-args: VITE_API_BASE_URL=https://api.skatetrax.com/api/v4
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/skatetrax_frontend:prod
