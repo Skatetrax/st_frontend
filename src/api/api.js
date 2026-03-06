@@ -1,4 +1,4 @@
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || `http://${window.location.hostname}:5000/api/v4`;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}:5000/api/v4`;
 
 async function handleResponse(resp) {
   if (!resp.ok) {
@@ -82,5 +82,16 @@ export async function getCoaches() {
 
 export async function getIceTypes() {
   const resp = await fetch(`${BASE_URL}/lookup/ice_types`, { credentials: "include" });
+  return handleResponse(resp);
+}
+
+export async function getEvents(category) {
+  const params = category ? `?category=${encodeURIComponent(category)}` : "";
+  const resp = await fetch(`${BASE_URL}/events${params}`, { credentials: "include" });
+  return handleResponse(resp);
+}
+
+export async function getEventDetail(eventId) {
+  const resp = await fetch(`${BASE_URL}/events/${eventId}`, { credentials: "include" });
   return handleResponse(resp);
 }
