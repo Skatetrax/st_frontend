@@ -55,30 +55,30 @@ export default function Dashboard() {
   useEffect(() => { fetchDashboard(); }, []);
 
   // Pie chart (Summary) data from API or fallback
-  let summaryData = {
-    labels: ["Coached", "Practice", "Group Classes"],
-    datasets: [
-      {
-        data: [0, 0, 0],
-        backgroundColor: ["#36A2EB", "#FFCE56", "#8536ebff"],
-        borderWidth: 2,
-      },
-    ],
-  };
-  if (dashboardData && dashboardData.charts && dashboardData.charts.monthly_ratio) {
+  let summaryData;
+  const ratio = dashboardData?.charts?.monthly_ratio;
+  const coached = toDecimalHours(ratio?.coached);
+  const practice = toDecimalHours(ratio?.practice);
+  const group = toDecimalHours(ratio?.group);
+  const hasTrainingData = coached + practice + group > 0;
+
+  if (hasTrainingData) {
     summaryData = {
       labels: ["Coached", "Practice", "Group Classes"],
-      datasets: [
-        {
-          data: [
-            toDecimalHours(dashboardData.charts.monthly_ratio.coached),
-            toDecimalHours(dashboardData.charts.monthly_ratio.practice),
-            toDecimalHours(dashboardData.charts.monthly_ratio.group),
-          ],
-          backgroundColor: ["#36A2EB", "#FFCE56", "#8536ebff"],
-          borderWidth: 0,
-        },
-      ],
+      datasets: [{
+        data: [coached, practice, group],
+        backgroundColor: ["#2563eb", "#a78bfa", "#60a5fa"],
+        borderWidth: 0,
+      }],
+    };
+  } else {
+    summaryData = {
+      labels: ["No data yet"],
+      datasets: [{
+        data: [1],
+        backgroundColor: ["#3f3f46"],
+        borderWidth: 0,
+      }],
     };
   }
 
@@ -90,6 +90,7 @@ export default function Dashboard() {
         labels: { color: "#fff" },
       },
       tooltip: {
+        filter: (item) => item.label !== "No data yet",
         callbacks: {
           label: (ctx) => {
             const totalMin = ctx.raw * 60;
@@ -138,7 +139,14 @@ export default function Dashboard() {
                       ...donutOptions,
                       plugins: {
                         ...donutOptions.plugins,
-                        legend: { ...donutOptions.plugins.legend, position: 'bottom', labels: { color: '#a1a1aa' } },
+                        legend: {
+                          ...donutOptions.plugins.legend,
+                          position: 'bottom',
+                          labels: {
+                            color: '#a1a1aa',
+                            filter: (item) => item.text !== "No data yet",
+                          },
+                        },
                       },
                     }} />
                   )}
@@ -181,7 +189,6 @@ export default function Dashboard() {
                   ) : (
                     (() => {
                       const spend = dashboardData?.charts?.spend || {};
-                      // Parse values as numbers (remove commas, parseFloat)
                       const parseSpend = (val) => parseFloat((val || '0').replace(/,/g, ''));
                       const classVal = parseSpend(spend.class);
                       const coachingVal = parseSpend(spend.coaching);
@@ -191,36 +198,27 @@ export default function Dashboard() {
                       const membershipVal = parseSpend(spend.membership);
                       const competitionVal = parseSpend(spend.competition);
                       const totalVal = parseSpend(spend.total);
+
+                      const emptyRing = { data: [1], backgroundColor: ["#3f3f46"], borderWidth: 0, empty: true };
+                      const outerHasData = classVal + coachingVal + iceTimeVal > 0;
+                      const middleHasData = equipmentVal + maintenanceVal > 0;
+                      const innerHasData = membershipVal + competitionVal > 0;
+
                       return (
                         <>
                           <Doughnut
                             data={{
-                              labels: [], // no legend needed
+                              labels: [],
                               datasets: [
-                                {
-                                  // Outer ring: class, coaching, ice_time
-                                  data: [classVal, coachingVal, iceTimeVal],
-                                  backgroundColor: ["#a78bfa", "#22c55e", "#36A2EB"],
-                                  borderWidth: 2,
-                                  borderColor: "#232a2d",
-                                  hoverOffset: 4,
-                                },
-                                {
-                                  // Middle ring: equipment, maintenance
-                                  data: [equipmentVal, maintenanceVal],
-                                  backgroundColor: ["#f59e42", "#eab308"],
-                                  borderWidth: 2,
-                                  borderColor: "#232a2d",
-                                  hoverOffset: 8,
-                                },
-                                {
-                                  // Inner ring: membership, competition
-                                  data: [membershipVal, competitionVal],
-                                  backgroundColor: ["#6366f1", "#FF6384"],
-                                  borderWidth: 2,
-                                  borderColor: "#232a2d",
-                                  hoverOffset: 12,
-                                },
+                                outerHasData
+                                  ? { data: [classVal, coachingVal, iceTimeVal], backgroundColor: ["#60a5fa", "#2563eb", "#a78bfa"], borderWidth: 2, borderColor: "#232a2d", hoverOffset: 4 }
+                                  : { ...emptyRing },
+                                middleHasData
+                                  ? { data: [equipmentVal, maintenanceVal], backgroundColor: ["#86efac", "#22c55e"], borderWidth: 2, borderColor: "#232a2d", hoverOffset: 8 }
+                                  : { ...emptyRing },
+                                innerHasData
+                                  ? { data: [membershipVal, competitionVal], backgroundColor: ["#eab308", "#f59e42"], borderWidth: 2, borderColor: "#232a2d", hoverOffset: 12 }
+                                  : { ...emptyRing },
                               ],
                             }}
                             options={{
@@ -228,9 +226,9 @@ export default function Dashboard() {
                               plugins: {
                                 legend: { display: false },
                                 tooltip: {
+                                  filter: (item) => !item.dataset.empty,
                                   callbacks: {
                                     label: function(context) {
-                                      // Map index to label
                                       const ringLabels = [
                                         ["Class", "Coaching", "Ice Time"],
                                         ["Equipment", "Maintenance"],
@@ -281,30 +279,39 @@ export default function Dashboard() {
                   ) : dashboardError ? (
                     <div style={{ color: 'red', textAlign: 'center', paddingTop: '60px' }}>{dashboardError}</div>
                   ) : (
-                    <Doughnut
-                      data={{
-                        labels: ["Active", "Remaining"],
-                        datasets: [
-                          {
-                            data: dashboardData && dashboardData.maintenance
-                              ? [
-                                  toDecimalHours(dashboardData.maintenance.active_minutes),
-                                  toDecimalHours(dashboardData.maintenance.remaining_minutes),
-                                ]
-                              : [0, 0],
-                            backgroundColor: ["#22c55e", "#e5f9e7"],
-                            borderWidth: 0,
-                          },
-                        ],
-                      }}
-                      options={{
-                        ...donutOptions,
-                        plugins: {
-                          ...donutOptions.plugins,
-                          legend: { ...donutOptions.plugins.legend, position: 'bottom', labels: { color: '#a1a1aa' } },
-                        },
-                      }}
-                    />
+                    (() => {
+                      const activeVal = dashboardData?.maintenance ? toDecimalHours(dashboardData.maintenance.active_minutes) : 0;
+                      const remainVal = dashboardData?.maintenance ? toDecimalHours(dashboardData.maintenance.remaining_minutes) : 0;
+                      const hasMaintData = activeVal + remainVal > 0;
+                      return (
+                        <Doughnut
+                          data={hasMaintData
+                            ? {
+                                labels: ["Active", "Remaining"],
+                                datasets: [{ data: [activeVal, remainVal], backgroundColor: ["#22c55e", "#e5f9e7"], borderWidth: 0 }],
+                              }
+                            : {
+                                labels: ["No data yet"],
+                                datasets: [{ data: [1], backgroundColor: ["#3f3f46"], borderWidth: 0 }],
+                              }
+                          }
+                          options={{
+                            ...donutOptions,
+                            plugins: {
+                              ...donutOptions.plugins,
+                              legend: {
+                                ...donutOptions.plugins.legend,
+                                position: 'bottom',
+                                labels: {
+                                  color: '#a1a1aa',
+                                  filter: (item) => item.text !== "No data yet",
+                                },
+                              },
+                            },
+                          }}
+                        />
+                      );
+                    })()
                   )}
                   {/* Center value: show total clock minutes if data loaded */}
                   {!dashboardLoading && !dashboardError && dashboardData && dashboardData.maintenance && (

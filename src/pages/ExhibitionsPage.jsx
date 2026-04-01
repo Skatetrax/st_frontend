@@ -22,7 +22,7 @@ export default function ExhibitionsPage() {
     setLoading(true);
     getEvents("Exhibition")
       .then(setData)
-      .catch(() => setError("Failed to load exhibition data"))
+      .catch((err) => setError(err?.message || "Failed to load exhibition data"))
       .finally(() => setLoading(false));
   };
 
@@ -67,7 +67,10 @@ export default function ExhibitionsPage() {
         {loading ? (
           <div style={{ color: "#a1a1aa", textAlign: "center", paddingTop: 80 }}>Loading...</div>
         ) : error ? (
-          <div style={{ color: "red", textAlign: "center", paddingTop: 80 }}>{error}</div>
+          <div style={{ textAlign: "center", paddingTop: 80 }}>
+            <div style={{ color: "red", marginBottom: 8 }}>Something went wrong loading exhibition data.</div>
+            <div style={{ color: "#a1a1aa", fontSize: "0.85rem" }}>{error}</div>
+          </div>
         ) : (
           <Row>
             <Col md={12}>
