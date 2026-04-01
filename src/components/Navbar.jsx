@@ -319,7 +319,7 @@ export default function AppNavbar({ onDataChange }) {
                     <Form.Select value={evtCoach} onChange={e => setEvtCoach(e.target.value)}>
                       <option value="">None</option>
                       {coaches.map(c => (
-                        <option key={c.coach_id} value={c.coach_id}>{c.coach_name}</option>
+                        <option key={c.coach_id} value={c.coach_id}>{c.coach_Fname} {c.coach_Lname}</option>
                       ))}
                     </Form.Select>
                   </Form.Group>
