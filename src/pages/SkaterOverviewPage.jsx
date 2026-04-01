@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import "../Dashboard.css";
-import { getSkaterOverview } from "../api/api";
+import { getSkaterOverview, shareSkaterCard, unshareSkaterCard } from "../api/api";
 import Navbar from "../components/Navbar";
 import dayjs from "dayjs";
 
@@ -22,13 +22,40 @@ export default function SkaterOverviewPage() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [shareToken, setShareToken] = useState(null);
+  const [shareCopied, setShareCopied] = useState(false);
 
   useEffect(() => {
     getSkaterOverview()
-      .then(setData)
+      .then((d) => {
+        setData(d);
+        setShareToken(d?.user_meta?.share_token || null);
+      })
       .catch(() => setError("Failed to load skater profile"))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleShare = async () => {
+    try {
+      const res = await shareSkaterCard();
+      setShareToken(res.share_token);
+      const url = `${window.location.origin}/shared/card/${res.share_token}`;
+      await navigator.clipboard.writeText(url);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch {
+      /* best-effort */
+    }
+  };
+
+  const handleUnshare = async () => {
+    try {
+      await unshareSkaterCard();
+      setShareToken(null);
+    } catch {
+      /* best-effort */
+    }
+  };
 
   const g = data?.user_general || {};
   const c = data?.user_contact || {};
@@ -147,6 +174,31 @@ export default function SkaterOverviewPage() {
                       {Array.isArray(meta.user_roles) && meta.user_roles.length > 0
                         ? meta.user_roles.join(", ")
                         : "—"}
+                    </div>
+                    <div style={labelStyle}>Skater Card</div>
+                    <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 4 }}>
+                      <button
+                        onClick={handleShare}
+                        title={shareToken ? "Copy share link" : "Share your skater card"}
+                        style={{
+                          background: "none", border: "none", cursor: "pointer",
+                          color: shareToken ? "#3b82f6" : "#a1a1aa", fontSize: "1.1rem",
+                        }}
+                      >
+                        {shareCopied ? "✓ Copied!" : "🔗 Share"}
+                      </button>
+                      {shareToken && (
+                        <button
+                          onClick={handleUnshare}
+                          title="Stop sharing"
+                          style={{
+                            background: "none", border: "none", cursor: "pointer",
+                            color: "#ef4444", fontSize: "0.85rem",
+                          }}
+                        >
+                          Unshare
+                        </button>
+                      )}
                     </div>
                   </Card.Body>
                 </Card>

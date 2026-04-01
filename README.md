@@ -1,70 +1,52 @@
-# Getting Started with Create React App
+# Skatetrax Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React-based UI for Skatetrax, built with Vite.
 
-## Available Scripts
+## Stack
 
-In the project directory, you can run:
+- **React 19** with React Router 7
+- **Vite 6** (dev server and production build)
+- **React-Bootstrap 2** + Bootstrap 5
+- **Chart.js 4** via react-chartjs-2
+- **Day.js** for date formatting
 
-### `npm start`
+## Development
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```bash
+npm install
+npm run dev
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+The dev server runs on `http://localhost:3000` and proxies `/api` requests to `http://127.0.0.1:5000` (the Flask backend).
 
-### `npm test`
+## Production Build
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+npm run build
+```
 
-### `npm run build`
+Output goes to `dist/`. The `VITE_API_BASE_URL` env var sets the API base URL at build time (defaults to `http://<hostname>:5000/api/v4`).
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Pages
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+| Route | Auth | Description |
+|---|---|---|
+| `/login` | No | Login page |
+| `/dashboard` | Yes | Overview dashboard with charts |
+| `/skater_overview` | Yes | Profile, preferences, share controls |
+| `/skater_card` | Yes | Skater Card -- resume-style stats summary |
+| `/ice_time` | Yes | Session history, calendar, financial overview |
+| `/equipment/configs` | Yes | Equipment configurations |
+| `/equipment/maintenance` | Yes | Blade maintenance tracking |
+| `/performances/competitions` | Yes | Competition results and history |
+| `/performances/exhibitions` | Yes | Exhibition and showcase history |
+| `/performances/music` | Yes | Music library -- tracks, playlists, sharing |
+| `/add-session` | Yes | Mobile-friendly session entry |
+| `/shared/playlist/:token` | No | Public shared playlist page |
+| `/shared/card/:token` | No | Public shared skater card |
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## CI
 
-### `npm run eject`
+PRs to `dev`/`main` trigger validation: `npm ci`, `npm audit` (report only), and a production build check.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Pushes to `main` build and push the Docker image to Docker Hub via `build-push.yml`.

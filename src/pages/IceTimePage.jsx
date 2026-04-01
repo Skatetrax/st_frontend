@@ -59,23 +59,38 @@ export default function IceTimePage() {
   const [iceTimeData, setIceTimeData] = useState(null);
   const [iceTimeError, setIceTimeError] = useState(null);
   const [iceTimeLoading, setIceTimeLoading] = useState(true);
+  const [calendarOffset, setCalendarOffset] = useState(0);
+  const [calendarLoading, setCalendarLoading] = useState(false);
 
-  const fetchIceTime = () => {
+  const fetchIceTime = (monthsBack = 0) => {
     setIceTimeLoading(true);
-    getIceTime()
+    getIceTime({ monthsBack })
       .then((data) => {
         setIceTimeData(data);
         setIceTimeLoading(false);
       })
-      .catch((err) => {
+      .catch(() => {
         setIceTimeError("Failed to load ice time data");
         setIceTimeLoading(false);
       });
   };
 
+  const shiftCalendar = (delta) => {
+    const next = Math.max(0, calendarOffset + delta);
+    setCalendarOffset(next);
+    setCalendarLoading(true);
+    getIceTime({ monthsBack: next })
+      .then((data) => {
+        setIceTimeData(prev => ({ ...prev, fsc_graph: data.fsc_graph }));
+      })
+      .catch(() => {})
+      .finally(() => setCalendarLoading(false));
+  };
+
   const refreshAll = () => {
     fetchDashboard();
-    fetchIceTime();
+    setCalendarOffset(0);
+    fetchIceTime(0);
   };
 
   useEffect(() => { fetchDashboard(); }, []);
@@ -196,14 +211,15 @@ export default function IceTimePage() {
                     return `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                   };
                   const categories = [
-                    { label: "Equipment", value: spend.equipment },
-                    { label: "Maintenance", value: spend.maintenance },
-                    { label: "Class Fees", value: spend.class },
-                    { label: "Performance Fees", value: spend.performance },
-                    { label: "Membership Fees", value: spend.membership },
-                    { label: "Competition Fees", value: spend.competition },
                     { label: "Ice Time", value: spend.ice_time },
                     { label: "Coaching", value: spend.coaching },
+                    { label: "Group Class Fees", value: spend.class },
+                    { label: "Skate Camp Fees", value: spend.camp },
+                    { label: "Maintenance Costs", value: spend.maintenance },
+                    { label: "Equipment Costs", value: spend.equipment },
+                    { label: "Competition Fees", value: spend.competition },
+                    { label: "Performance Fees", value: spend.performance },
+                    { label: "Membership Fees", value: spend.membership },
                   ];
                   return (
                     <div>
@@ -324,21 +340,21 @@ export default function IceTimePage() {
                         <div style={{ fontSize: '0.85rem', color: '#a1a1aa', marginBottom: '0.25rem' }}>{currentMonth} Breakdown</div>
                         <div style={{ display: 'flex', marginTop: '0.5rem' }}>
                           <div style={{ flex: 1, textAlign: 'center' }}>
-                            <div style={{ color: '#36A2EB', fontWeight: 600, fontSize: '1.1rem' }}>
+                            <div style={{ color: '#2563eb', fontWeight: 600, fontSize: '1.1rem' }}>
                               {coached}
                               {dCoached && <span style={{ fontSize: '0.7rem', color: dCoached.color, marginLeft: 4 }}>{dCoached.label}</span>}
                             </div>
                             <div style={{ color: '#a1a1aa', fontSize: '0.75rem' }}>Coached</div>
                           </div>
                           <div style={{ flex: 1, textAlign: 'center' }}>
-                            <div style={{ color: '#FFCE56', fontWeight: 600, fontSize: '1.1rem' }}>
+                            <div style={{ color: '#a78bfa', fontWeight: 600, fontSize: '1.1rem' }}>
                               {practice}
                               {dPractice && <span style={{ fontSize: '0.7rem', color: dPractice.color, marginLeft: 4 }}>{dPractice.label}</span>}
                             </div>
                             <div style={{ color: '#a1a1aa', fontSize: '0.75rem' }}>Practice</div>
                           </div>
                           <div style={{ flex: 1, textAlign: 'center' }}>
-                            <div style={{ color: '#a78bfa', fontWeight: 600, fontSize: '1.1rem' }}>
+                            <div style={{ color: '#60a5fa', fontWeight: 600, fontSize: '1.1rem' }}>
                               {group}
                               {dGroup && <span style={{ fontSize: '0.7rem', color: dGroup.color, marginLeft: 4 }}>{dGroup.label}</span>}
                             </div>
@@ -348,15 +364,15 @@ export default function IceTimePage() {
                         <div style={{ fontSize: '0.85rem', color: '#a1a1aa', marginBottom: '0.25rem', marginTop: '0.75rem' }}>Baseline Breakdown</div>
                         <div style={{ display: 'flex', marginTop: '0.5rem' }}>
                           <div style={{ flex: 1, textAlign: 'center' }}>
-                            <div style={{ color: '#36A2EB', fontWeight: 600, fontSize: '1.1rem', opacity: 0.6 }}>{blCoached}</div>
+                            <div style={{ color: '#2563eb', fontWeight: 600, fontSize: '1.1rem', opacity: 0.6 }}>{blCoached}</div>
                             <div style={{ color: '#a1a1aa', fontSize: '0.75rem' }}>Coached</div>
                           </div>
                           <div style={{ flex: 1, textAlign: 'center' }}>
-                            <div style={{ color: '#FFCE56', fontWeight: 600, fontSize: '1.1rem', opacity: 0.6 }}>{blPractice}</div>
+                            <div style={{ color: '#a78bfa', fontWeight: 600, fontSize: '1.1rem', opacity: 0.6 }}>{blPractice}</div>
                             <div style={{ color: '#a1a1aa', fontSize: '0.75rem' }}>Practice</div>
                           </div>
                           <div style={{ flex: 1, textAlign: 'center' }}>
-                            <div style={{ color: '#a78bfa', fontWeight: 600, fontSize: '1.1rem', opacity: 0.6 }}>{blGroup}</div>
+                            <div style={{ color: '#60a5fa', fontWeight: 600, fontSize: '1.1rem', opacity: 0.6 }}>{blGroup}</div>
                             <div style={{ color: '#a1a1aa', fontSize: '0.75rem' }}>Group</div>
                           </div>
                         </div>
@@ -364,62 +380,60 @@ export default function IceTimePage() {
                       {/* Right side: doughnut chart */}
                       <div style={{ width: '280px', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                         <div className="card-subtitle" style={{ textAlign: 'center', marginBottom: '0.5rem' }}>Year (outer) vs Month (inner)</div>
-                        <Doughnut
-                          data={{
-                            labels: ["Coached", "Practice", "Group Classes"],
-                            datasets: [
-                              {
-                                data: dashboardData?.charts?.yearly_ratio
-                                  ? [
-                                      toDecimalHours(dashboardData.charts.yearly_ratio.coached),
-                                      toDecimalHours(dashboardData.charts.yearly_ratio.practice),
-                                      toDecimalHours(dashboardData.charts.yearly_ratio.group),
-                                    ]
-                                  : [0, 0, 0],
-                                backgroundColor: ["#36A2EB", "#FFCE56", "#a78bfa"],
-                                borderWidth: 2,
-                                borderColor: "#232a2d",
-                                hoverOffset: 8,
-                              },
-                              {
-                                data: dashboardData?.charts?.monthly_ratio
-                                  ? [
-                                      toDecimalHours(dashboardData.charts.monthly_ratio.coached),
-                                      toDecimalHours(dashboardData.charts.monthly_ratio.practice),
-                                      toDecimalHours(dashboardData.charts.monthly_ratio.group),
-                                    ]
-                                  : [0, 0, 0],
-                                backgroundColor: ["#36A2EB", "#FFCE56", "#a78bfa"],
-                                borderWidth: 2,
-                                borderColor: "#232a2d",
-                                hoverOffset: 4,
-                              },
-                            ],
-                          }}
-                          options={{
-                            ...donutOptions,
-                            plugins: {
-                              ...donutOptions.plugins,
-                              legend: {
-                                ...donutOptions.plugins.legend,
-                                position: 'bottom',
-                                labels: { color: '#a1a1aa' },
-                              },
-                              tooltip: {
-                                callbacks: {
-                                  label: function(context) {
-                                    const ring = context.datasetIndex === 0 ? 'Year' : 'Month';
-                                    const totalMin = context.raw * 60;
-                                    const h = Math.floor(totalMin / 60);
-                                    const m = Math.round(totalMin % 60);
-                                    return `${ring} - ${context.label}: ${h}h ${m}m`;
+                        {(() => {
+                          const yr = dashboardData?.charts?.yearly_ratio;
+                          const mo = dashboardData?.charts?.monthly_ratio;
+                          const yrCoached = toDecimalHours(yr?.coached);
+                          const yrPractice = toDecimalHours(yr?.practice);
+                          const yrGroup = toDecimalHours(yr?.group);
+                          const moCoached = toDecimalHours(mo?.coached);
+                          const moPractice = toDecimalHours(mo?.practice);
+                          const moGroup = toDecimalHours(mo?.group);
+                          const yearHasData = yrCoached + yrPractice + yrGroup > 0;
+                          const monthHasData = moCoached + moPractice + moGroup > 0;
+
+                          const emptyRing = { data: [1], backgroundColor: ["#3f3f46"], borderWidth: 0, empty: true };
+
+                          return (
+                            <Doughnut
+                              data={{
+                                labels: ["Coached", "Practice", "Group Classes"],
+                                datasets: [
+                                  yearHasData
+                                    ? { data: [yrCoached, yrPractice, yrGroup], backgroundColor: ["#2563eb", "#a78bfa", "#60a5fa"], borderWidth: 2, borderColor: "#232a2d", hoverOffset: 8 }
+                                    : { ...emptyRing },
+                                  monthHasData
+                                    ? { data: [moCoached, moPractice, moGroup], backgroundColor: ["#2563eb", "#a78bfa", "#60a5fa"], borderWidth: 2, borderColor: "#232a2d", hoverOffset: 4 }
+                                    : { ...emptyRing },
+                                ],
+                              }}
+                              options={{
+                                ...donutOptions,
+                                plugins: {
+                                  ...donutOptions.plugins,
+                                  legend: {
+                                    ...donutOptions.plugins.legend,
+                                    position: 'bottom',
+                                    labels: { color: '#a1a1aa' },
+                                  },
+                                  tooltip: {
+                                    filter: (item) => !item.dataset.empty,
+                                    callbacks: {
+                                      label: function(context) {
+                                        const ring = context.datasetIndex === 0 ? 'Year' : 'Month';
+                                        const totalMin = context.raw * 60;
+                                        const h = Math.floor(totalMin / 60);
+                                        const m = Math.round(totalMin % 60);
+                                        return `${ring} - ${context.label}: ${h}h ${m}m`;
+                                      }
+                                    }
                                   }
-                                }
-                              }
-                            },
-                            cutout: '60%',
-                          }}
-                        />
+                                },
+                                cutout: '60%',
+                              }}
+                            />
+                          );
+                        })()}
                       </div>
                     </div>
                   );
@@ -434,10 +448,54 @@ export default function IceTimePage() {
           <Col md={12}>
             <Card className="dashboard-card">
               <Card.Body>
-                <Card.Title>Figure Skater Calendar</Card.Title>
-                <div className="card-subtitle">Monthly breakdown of ice time, coaching, competitions, and group sessions</div>
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <div>
+                    <Card.Title style={{ margin: 0 }}>Figure Skater Calendar</Card.Title>
+                    <div className="card-subtitle" style={{ marginBottom: 0 }}>Monthly breakdown of ice time, coaching, competitions, and group sessions</div>
+                  </div>
+                  <div className="d-flex align-items-center" style={{ gap: 6, minWidth: 220, justifyContent: "flex-end" }}>
+                    <button
+                      onClick={() => shiftCalendar(3)}
+                      disabled={calendarLoading}
+                      title="Go back 3 months"
+                      style={{
+                        background: "none", border: "1px solid #4b5563", borderRadius: 4,
+                        color: "#a1a1aa", cursor: "pointer", padding: "4px 10px", fontSize: "0.9rem",
+                      }}
+                    >
+                      &#9664;
+                    </button>
+                    <button
+                      onClick={() => shiftCalendar(-3)}
+                      disabled={calendarOffset === 0 || calendarLoading}
+                      title="Go forward 3 months"
+                      style={{
+                        background: "none", border: "1px solid #4b5563", borderRadius: 4,
+                        color: calendarOffset === 0 ? "#333" : "#a1a1aa",
+                        cursor: calendarOffset === 0 ? "default" : "pointer",
+                        padding: "4px 10px", fontSize: "0.9rem",
+                      }}
+                    >
+                      &#9654;
+                    </button>
+                    <button
+                      onClick={() => { setCalendarOffset(0); setCalendarLoading(true); getIceTime({ monthsBack: 0 }).then(data => setIceTimeData(prev => ({ ...prev, fsc_graph: data.fsc_graph }))).finally(() => setCalendarLoading(false)); }}
+                      disabled={calendarOffset === 0 || calendarLoading}
+                      title="Reset to present"
+                      style={{
+                        background: "none", border: "1px solid #4b5563", borderRadius: 4,
+                        color: calendarOffset === 0 ? "#333" : "#a78bfa",
+                        cursor: calendarOffset === 0 ? "default" : "pointer",
+                        padding: "4px 8px", fontSize: "0.78rem",
+                        visibility: calendarOffset === 0 ? "hidden" : "visible",
+                      }}
+                    >
+                      Now
+                    </button>
+                  </div>
+                </div>
                 <div className="chart-container">
-                  {iceTimeLoading ? (
+                  {(iceTimeLoading || calendarLoading) ? (
                     <div style={{ color: '#a1a1aa', textAlign: 'center', paddingTop: '60px' }}>Loading...</div>
                   ) : iceTimeError ? (
                     <div style={{ color: 'red', textAlign: 'center', paddingTop: '60px' }}>{iceTimeError}</div>
@@ -463,24 +521,24 @@ export default function IceTimePage() {
                               {
                                 label: 'Practice',
                                 data: practice,
-                                borderColor: '#FFCE56',
-                                backgroundColor: 'rgba(255,206,86,0.1)',
+                                borderColor: '#a78bfa',
+                                backgroundColor: 'rgba(167,139,250,0.1)',
                                 fill: true,
                                 tension: 0.3,
                               },
                               {
                                 label: 'Coached',
                                 data: coach,
-                                borderColor: '#22c55e',
-                                backgroundColor: 'rgba(34,197,94,0.1)',
+                                borderColor: '#2563eb',
+                                backgroundColor: 'rgba(37,99,235,0.1)',
                                 fill: true,
                                 tension: 0.3,
                               },
                               {
                                 label: 'Group Sessions',
                                 data: group,
-                                borderColor: '#a78bfa',
-                                backgroundColor: 'rgba(167,139,250,0.1)',
+                                borderColor: '#60a5fa',
+                                backgroundColor: 'rgba(96,165,250,0.1)',
                                 fill: true,
                                 tension: 0.3,
                               },
@@ -501,7 +559,7 @@ export default function IceTimePage() {
                           options={{
                             plugins: { legend: { labels: { color: '#a1a1aa' } } },
                             elements: { line: { borderWidth: 2 }, point: { radius: 3 } },
-                            scales: { x: { ticks: { color: '#a1a1aa' } }, y: { ticks: { color: '#a1a1aa' } } },
+                            scales: { x: { ticks: { color: '#a1a1aa' } }, y: { min: 0, ticks: { color: '#a1a1aa' } } },
                             responsive: true,
                             maintainAspectRatio: false,
                           }}
