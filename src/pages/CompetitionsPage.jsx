@@ -43,7 +43,7 @@ export default function CompetitionsPage() {
     setLoading(true);
     getEvents("Competition")
       .then(setData)
-      .catch(() => setError("Failed to load competition data"))
+      .catch((err) => setError(err?.message || "Failed to load competition data"))
       .finally(() => setLoading(false));
   };
 
@@ -440,7 +440,23 @@ export default function CompetitionsPage() {
         {loading ? (
           <div style={{ color: "#a1a1aa", textAlign: "center", paddingTop: 80 }}>Loading...</div>
         ) : error ? (
-          <div style={{ color: "red", textAlign: "center", paddingTop: 80 }}>{error}</div>
+          <div style={{ textAlign: "center", paddingTop: 80 }}>
+            <div style={{ color: "red", marginBottom: 8 }}>Something went wrong loading competition data.</div>
+            <div style={{ color: "#a1a1aa", fontSize: "0.85rem" }}>{error}</div>
+          </div>
+        ) : allRows.length === 0 ? (
+          <Row>
+            <Col md={12}>
+              <Card className="dashboard-card" style={{ minHeight: "auto" }}>
+                <Card.Body>
+                  <Card.Title>Competitions</Card.Title>
+                  <div style={{ color: "#a1a1aa", textAlign: "center", padding: "3rem 0" }}>
+                    No competitions logged yet.
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
         ) : (
           <>
             {/* Upcoming Competitions */}
