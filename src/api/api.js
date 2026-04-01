@@ -89,6 +89,11 @@ export async function getRinks() {
   return handleResponse(resp);
 }
 
+export async function getClubs() {
+  const resp = await fetch(`${BASE_URL}/public/clubs`, { credentials: "include" });
+  return handleResponse(resp);
+}
+
 export async function getCoaches() {
   const resp = await fetch(`${BASE_URL}/lookup/coaches`, { credentials: "include" });
   return handleResponse(resp);
