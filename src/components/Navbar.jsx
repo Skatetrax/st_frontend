@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Navbar, Nav, NavDropdown, Dropdown, Button, Modal, Form, Alert, Row, Col } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
-import { getSkaterOverview, getRinks, getCoaches, addMaintenance, createEvent, addEventEntry } from "../api/api";
+import { getSkaterOverview, getRinks, getCoaches, getClubs, addMaintenance, createEvent, addEventEntry } from "../api/api";
 import { fmtTime } from "../utils/timeUtils";
 import SessionForm from "./SessionForm";
+import Autocomplete from "./Autocomplete";
 import dayjs from "dayjs";
 import "../Dashboard.css";
 
@@ -20,6 +21,7 @@ export default function AppNavbar({ onDataChange }) {
   const [totalHours, setTotalHours] = useState("");
   const [rinks, setRinks] = useState([]);
   const [coaches, setCoaches] = useState([]);
+  const [clubs, setClubs] = useState([]);
   const [maintDate, setMaintDate] = useState(dayjs().format("YYYY-MM-DD"));
   const [maintLocation, setMaintLocation] = useState("");
   const [maintHoursOn, setMaintHoursOn] = useState("");
@@ -35,6 +37,7 @@ export default function AppNavbar({ onDataChange }) {
   const [evtLocation, setEvtLocation] = useState("");
   const [evtCoach, setEvtCoach] = useState("");
   const [evtCategory, setEvtCategory] = useState("Competition");
+  const [evtHostingClub, setEvtHostingClub] = useState("");
   // Collected entries (each has segment, status, scoring, videoUrl, entryFee)
   const [evtEntries, setEvtEntries] = useState([]);
   const [entrySegment, setEntrySegment] = useState("");
@@ -64,6 +67,7 @@ export default function AppNavbar({ onDataChange }) {
     setEvtLocation("");
     setEvtCoach("");
     setEvtCategory("Competition");
+    setEvtHostingClub("");
     setEvtEntries([]);
     setEvtOtherCosts([]);
     setCostCategory("Practice Ice");
@@ -101,6 +105,7 @@ export default function AppNavbar({ onDataChange }) {
         event_label: evtLabel.trim(),
         event_date: evtDate,
         event_location: evtLocation || null,
+        hosting_club: evtHostingClub || null,
         coach_id: evtCoach || null,
         costs: allCosts,
       });
@@ -128,15 +133,17 @@ export default function AppNavbar({ onDataChange }) {
   useEffect(() => {
     async function fetchNavData() {
       try {
-        const [userData, rinkData, coachData] = await Promise.all([
+        const [userData, rinkData, coachData, clubData] = await Promise.all([
           getSkaterOverview(),
           getRinks(),
           getCoaches().catch(() => []),
+          getClubs().catch(() => []),
         ]);
         setFirstName(userData?.user_general?.user_first_name || "User");
         setTotalHours(fmtTime(userData?.total_ice_time));
         setRinks(rinkData || []);
         setCoaches(coachData || []);
+        setClubs(clubData || []);
       } catch {
         setFirstName("User");
         setTotalHours("");
@@ -305,26 +312,45 @@ export default function AppNavbar({ onDataChange }) {
                 <Col sm={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>Location</Form.Label>
-                    <Form.Select value={evtLocation} onChange={e => setEvtLocation(e.target.value)}>
-                      <option value="">Select a rink</option>
-                      {rinks.map(r => (
-                        <option key={r.rink_id} value={r.rink_id}>{r.rink_name}</option>
-                      ))}
-                    </Form.Select>
+                    <Autocomplete
+                      items={rinks}
+                      value={evtLocation}
+                      onChange={setEvtLocation}
+                      getKey={r => r.rink_id}
+                      getLabel={r => r.rink_name}
+                      getSubLabel={r => [r.rink_city, r.rink_state].filter(Boolean).join(", ")}
+                      matchFn={(r, q) => r.rink_name?.toLowerCase().includes(q)}
+                      placeholder="Search rinks..."
+                    />
                   </Form.Group>
                 </Col>
                 <Col sm={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>Coach</Form.Label>
-                    <Form.Select value={evtCoach} onChange={e => setEvtCoach(e.target.value)}>
-                      <option value="">None</option>
-                      {coaches.map(c => (
-                        <option key={c.coach_id} value={c.coach_id}>{c.coach_Fname} {c.coach_Lname}</option>
-                      ))}
-                    </Form.Select>
+                    <Autocomplete
+                      items={coaches}
+                      value={evtCoach}
+                      onChange={setEvtCoach}
+                      getKey={c => c.coach_id}
+                      getLabel={c => `${c.coach_Fname} ${c.coach_Lname}`}
+                      matchFn={(c, q) => c.coach_Fname?.toLowerCase().includes(q) || c.coach_Lname?.toLowerCase().includes(q)}
+                      placeholder="Search coaches..."
+                    />
                   </Form.Group>
                 </Col>
               </Row>
+              <Form.Group className="mb-3">
+                <Form.Label>Hosting Club</Form.Label>
+                <Autocomplete
+                  items={clubs}
+                  value={evtHostingClub}
+                  onChange={setEvtHostingClub}
+                  getKey={c => c.club_id}
+                  getLabel={c => c.club_name}
+                  matchFn={(c, q) => c.club_name?.toLowerCase().includes(q)}
+                  placeholder="Search clubs..."
+                />
+              </Form.Group>
               <div className="d-flex justify-content-end">
                 <Button
                   variant="primary"
@@ -589,17 +615,16 @@ export default function AppNavbar({ onDataChange }) {
             </Form.Group>
             <Form.Group className="mb-3" controlId="maintLocation">
               <Form.Label>Location</Form.Label>
-              <Form.Select
+              <Autocomplete
+                items={rinks}
                 value={maintLocation}
-                onChange={e => setMaintLocation(e.target.value)}
-              >
-                <option value="">Select a shop / rink</option>
-                {rinks.map(r => (
-                  <option key={r.rink_id} value={r.rink_id}>
-                    {r.rink_name}
-                  </option>
-                ))}
-              </Form.Select>
+                onChange={setMaintLocation}
+                getKey={r => r.rink_id}
+                getLabel={r => r.rink_name}
+                getSubLabel={r => [r.rink_city, r.rink_state].filter(Boolean).join(", ")}
+                matchFn={(r, q) => r.rink_name?.toLowerCase().includes(q)}
+                placeholder="Search shops / rinks..."
+              />
             </Form.Group>
             <Form.Group className="mb-3" controlId="maintHoursOn">
               <Form.Label>Hours On</Form.Label>
