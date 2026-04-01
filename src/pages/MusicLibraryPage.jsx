@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import {
-  Container, Row, Col, Card, Table, Button, Badge,
+  Container, Row, Col, Card, Table, Button, Badge, Alert,
   Tabs, Tab, Modal, Form, OverlayTrigger, Tooltip,
 } from "react-bootstrap";
 import "../Dashboard.css";
@@ -61,12 +61,13 @@ export default function MusicLibraryPage() {
   const [uploadYoutube, setUploadYoutube] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [uploadHint, setUploadHint] = useState("");
   const [loadError, setLoadError] = useState("");
 
   const resetUploadForm = () => {
     setUploadFile(null); setUploadTitle(""); setUploadArtist(""); setUploadCut(false);
     setUploadClearance("not_required"); setUploadProvider(""); setUploadRef("");
-    setUploadApple(""); setUploadSpotify(""); setUploadYoutube(""); setUploadError("");
+    setUploadApple(""); setUploadSpotify(""); setUploadYoutube(""); setUploadError(""); setUploadHint("");
   };
 
   const handleUploadSubmit = async () => {
@@ -88,8 +89,13 @@ export default function MusicLibraryPage() {
       }));
       const track = await uploadTrack(fd);
       setTracks(prev => [track, ...prev]);
+      const hint = track.duration_hint;
       resetUploadForm();
       setShowUpload(false);
+      if (hint === "practice") {
+        setUploadHint(`"${track.title}" is over 5 minutes — looks like a practice track. Mark it as a performance cut if it's been edited for competition.`);
+        setTimeout(() => setUploadHint(""), 8000);
+      }
     } catch (e) {
       setUploadError(e.message || "Upload failed");
     } finally {
@@ -260,6 +266,11 @@ export default function MusicLibraryPage() {
 
           {/* ── Library Tab ── */}
           <Tab eventKey="library" title="Library">
+            {uploadHint && (
+              <Alert variant="info" dismissible onClose={() => setUploadHint("")} className="mb-3">
+                {uploadHint}
+              </Alert>
+            )}
             <Row className="mb-3">
               <Col>
                 <div className="d-flex justify-content-between align-items-center">
@@ -713,7 +724,7 @@ export default function MusicLibraryPage() {
               <Form.Label>Audio File</Form.Label>
               <Form.Control type="file" accept="audio/*"
                 onChange={e => setUploadFile(e.target.files?.[0] || null)} />
-              <Form.Text className="text-muted">MP3, AAC, WAV -- max 5 minutes</Form.Text>
+              <Form.Text className="text-muted">MP3, AAC, WAV -- max 20MB</Form.Text>
             </Form.Group>
             <Row>
               <Col sm={6}>
