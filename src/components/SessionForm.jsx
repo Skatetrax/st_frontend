@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Form, Button, Spinner, Alert } from "react-bootstrap";
 import { getRinks, getSkaterOverview, getCoaches, getIceTypes, submitIceTime } from "../api/api";
+import Autocomplete from "./Autocomplete";
 import dayjs from "dayjs";
 
 const STORAGE_KEY = "skatetrax_add_session_draft";
@@ -105,13 +106,6 @@ export default function SessionForm({ variant = "full", onSuccess, onAuthError }
     return () => { cancelled = true; };
   }, [onAuthError]);
 
-  const handleCoachChange = (e) => {
-    const id = e.target.value;
-    setPreferredCoach(id);
-    const found = coaches.find(c => c.coach_id === id);
-    setCoachRate(found ? found.coach_rate : "");
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (submittingRef.current) return;
@@ -211,21 +205,29 @@ export default function SessionForm({ variant = "full", onSuccess, onAuthError }
           </div>
           <div className="col-md-4 mb-2">
             <Form.Label>Rink Location</Form.Label>
-            <Form.Select value={preferredRink} onChange={e => setPreferredRink(e.target.value)}>
-              {rinks.map(rink => (
-                <option value={rink.rink_id} key={rink.rink_id}>{rink.rink_name}</option>
-              ))}
-            </Form.Select>
+            <Autocomplete
+              items={rinks}
+              value={preferredRink}
+              onChange={setPreferredRink}
+              getKey={r => r.rink_id}
+              getLabel={r => r.rink_name}
+              getSubLabel={r => [r.rink_city, r.rink_state].filter(Boolean).join(", ")}
+              matchFn={(r, q) => r.rink_name?.toLowerCase().includes(q)}
+              placeholder="Search rinks..."
+            />
           </div>
           <div className="col-md-4 mb-2">
             <Form.Label>Coach</Form.Label>
-            <Form.Select value={preferredCoach} onChange={handleCoachChange}>
-              {coaches.map(coach => (
-                <option value={coach.coach_id} key={coach.coach_id}>
-                  {coach.coach_Fname} {coach.coach_Lname}
-                </option>
-              ))}
-            </Form.Select>
+            <Autocomplete
+              items={coaches}
+              value={preferredCoach}
+              onChange={setPreferredCoach}
+              onSelect={c => setCoachRate(c ? c.coach_rate : "")}
+              getKey={c => c.coach_id}
+              getLabel={c => `${c.coach_Fname} ${c.coach_Lname}`}
+              matchFn={(c, q) => c.coach_Fname?.toLowerCase().includes(q) || c.coach_Lname?.toLowerCase().includes(q)}
+              placeholder="Search coaches..."
+            />
           </div>
         </div>
         <div className="d-flex justify-content-end">
@@ -280,21 +282,31 @@ export default function SessionForm({ variant = "full", onSuccess, onAuthError }
       </Form.Group>
       <Form.Group className="mb-3">
         <Form.Label>Rink</Form.Label>
-        <Form.Select value={preferredRink} onChange={e => setPreferredRink(e.target.value)} className={selClass}>
-          {rinks.map(rink => (
-            <option value={rink.rink_id} key={rink.rink_id}>{rink.rink_name}</option>
-          ))}
-        </Form.Select>
+        <Autocomplete
+          items={rinks}
+          value={preferredRink}
+          onChange={setPreferredRink}
+          getKey={r => r.rink_id}
+          getLabel={r => r.rink_name}
+          getSubLabel={r => [r.rink_city, r.rink_state].filter(Boolean).join(", ")}
+          matchFn={(r, q) => r.rink_name?.toLowerCase().includes(q)}
+          placeholder="Search rinks..."
+          className="form-control-lg"
+        />
       </Form.Group>
       <Form.Group className="mb-4">
         <Form.Label>Coach</Form.Label>
-        <Form.Select value={preferredCoach} onChange={handleCoachChange} className={selClass}>
-          {coaches.map(coach => (
-            <option value={coach.coach_id} key={coach.coach_id}>
-              {coach.coach_Fname} {coach.coach_Lname}
-            </option>
-          ))}
-        </Form.Select>
+        <Autocomplete
+          items={coaches}
+          value={preferredCoach}
+          onChange={setPreferredCoach}
+          onSelect={c => setCoachRate(c ? c.coach_rate : "")}
+          getKey={c => c.coach_id}
+          getLabel={c => `${c.coach_Fname} ${c.coach_Lname}`}
+          matchFn={(c, q) => c.coach_Fname?.toLowerCase().includes(q) || c.coach_Lname?.toLowerCase().includes(q)}
+          placeholder="Search coaches..."
+          className="form-control-lg"
+        />
       </Form.Group>
       {submitError && <Alert variant="danger" className="mb-3">{submitError}</Alert>}
       <Button

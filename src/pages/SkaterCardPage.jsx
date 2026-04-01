@@ -14,7 +14,7 @@ const titleStyle = {
 };
 
 const labelStyle = { color: "#a1a1aa", fontSize: "0.8rem", marginBottom: 2 };
-const valueStyle = { fontSize: "1.05rem", fontWeight: 600, color: "#fff", marginBottom: 10 };
+const valueStyle = { fontSize: "0.8rem", fontWeight: 500, color: "#d1d5db", marginBottom: 10 };
 
 function StatItem({ label, value }) {
   return (
@@ -120,7 +120,17 @@ export default function SkaterCardPage() {
             <Row>
               <Col sm={3}><StatItem label="Coach" value={current.coach} /></Col>
               <Col sm={3}><StatItem label="Home Rink" value={current.home_rink} /></Col>
-              <Col sm={3}><StatItem label="Equipment" value={current.equipment} /></Col>
+              <Col sm={3}>
+                <div style={labelStyle}>Equipment</div>
+                <div style={{ ...valueStyle, whiteSpace: "nowrap" }}>
+                  {current.boots || current.blades ? (
+                    <>
+                      {current.boots && <div>{current.boots}</div>}
+                      {current.blades && <div>{current.blades}</div>}
+                    </>
+                  ) : "—"}
+                </div>
+              </Col>
               <Col sm={3}>
                 <div style={labelStyle}>Shared Playlists</div>
                 {current.shared_playlists?.length > 0 ? (
@@ -175,7 +185,20 @@ export default function SkaterCardPage() {
                 <div style={{ color: "#6b7280", fontSize: "0.75rem", marginTop: -6, marginBottom: 10 }}>
                   {fmtFrequency(recent.sessions_per_week)} · ~{recent.avg_session_min} min per session
                 </div>
-                <StatItem label="Most Recent Event" value={recent.last_event || "No events yet"} />
+                <div style={labelStyle}>Most Recent Competition</div>
+                {recent.last_event ? (
+                  <div style={{ marginBottom: 10 }}>
+                    <div style={valueStyle}>{recent.last_event.name}</div>
+                    {recent.last_event.date && (
+                      <div style={{ color: "#9ca3af", fontSize: "0.75rem", paddingLeft: 12, marginTop: -6 }}>{recent.last_event.date}</div>
+                    )}
+                    {recent.last_event.location && (
+                      <div style={{ color: "#9ca3af", fontSize: "0.75rem", paddingLeft: 12, marginTop: 2 }}>{recent.last_event.location}</div>
+                    )}
+                  </div>
+                ) : (
+                  <div style={valueStyle}>No competitions yet</div>
+                )}
               </Card.Body>
             </Card>
           </Col>
