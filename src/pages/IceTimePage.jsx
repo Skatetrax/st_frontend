@@ -557,7 +557,12 @@ export default function IceTimePage() {
                             ],
                           }}
                           options={{
-                            plugins: { legend: { labels: { color: '#a1a1aa' } } },
+                            plugins: {
+                              legend: { labels: { color: '#a1a1aa' } },
+                              tooltip: {
+                                filter: (item) => item.dataset.label !== 'Competitions',
+                              },
+                            },
                             elements: { line: { borderWidth: 2 }, point: { radius: 3 } },
                             scales: { x: { ticks: { color: '#a1a1aa' } }, y: { min: 0, ticks: { color: '#a1a1aa' } } },
                             responsive: true,

@@ -1,6 +1,10 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}:5000/api/v4`;
 
 async function handleResponse(resp) {
+  if (resp.status === 401) {
+    window.location.replace("/login");
+    throw new Error("Session expired");
+  }
   if (!resp.ok) {
     const text = await resp.text();
     throw new Error(`${resp.status} ${resp.statusText}: ${text.slice(0, 200)}`);
@@ -22,6 +26,7 @@ export async function checkSession() {
   const resp = await fetch(`${BASE_URL}/auth/session`, {
     credentials: "include"
   });
+  if (!resp.ok) return { logged_in: false };
   return resp.json();
 }
 
@@ -71,7 +76,7 @@ export async function getIceTime({ monthsBack = 0, window = 12 } = {}) {
   if (window !== 12) params.set("window", window);
   const qs = params.toString();
   const resp = await fetch(`${BASE_URL}/members/ice_time${qs ? `?${qs}` : ""}`, { credentials: "include" });
-  return resp.json();
+  return handleResponse(resp);
 }
 
 export async function submitIceTime(data) {
